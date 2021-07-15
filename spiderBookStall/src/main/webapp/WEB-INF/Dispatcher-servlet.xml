@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+    <mvc:annotation-driven/>
+    <context:component-scan base-package="com.spiderBookStall"/>
+    <context:annotation-config/>
+
+    <!--WHEN SERVER IS SHUTDOWN-->
+    <bean class="org.springframework.jdbc.datasource.DriverManagerDataSource" name="serverDatasource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property name="url" value="jdbc:mysql://localhost:3306/book1"/>
+        <property name="username" value="root"/>
+        <property name="password" value="root"/>
+    </bean>
+    <!-- creating bean for jdbc template for crud operation-->
+    <bean class="org.springframework.jdbc.core.JdbcTemplate" name="serverJdbcTemplate">
+        <property name="dataSource" ref="serverDatasource"/>
+    </bean>
+ <!--  <bean class="com.spiderBookStall.ServerBookDataService.ServerBookDataImpl" id="BookRestApiService" primary="true" >
+    <property name="serverDao" ref="dao"></property>
+
+</bean>-->
+    <bean class="com.spiderBookStall.ServerBookDataDao.ServerDaoImpl" id="dao">
+        <property name="serverJdbcTemplate" ref="serverJdbcTemplate"/>
+    </bean>
+    <!--WHEN SERVER IS SHUTDOWN-->
+
+    <!--ShoppingCart-->
+    <bean class="com.spiderBookStall.ShoppingCart.AddToCardService.AddToCardServiceImpl" id="addToCardService"/>
+    <bean class="com.spiderBookStall.ShoppingCart.AddToCardDao.AddToCardDaoImpl" id="addToCardDao">
+        <property name="jdbcTemplate" ref="jdbcTemplate"></property>
+    </bean>
+
+    <!--ResourceBundle Bean-->
+    <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+        <property name="basename" value="CustomerRegistrationValidator"/>
+    </bean>
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/jsp/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+</beans>

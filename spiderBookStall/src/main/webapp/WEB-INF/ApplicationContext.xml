@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+    <mvc:annotation-driven/>
+
+    <!-- DATABASE CONNECTION-->
+    <bean class="org.springframework.jdbc.datasource.DriverManagerDataSource" name="datasource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property name="url" value="jdbc:mysql://localhost:3306/book"/>
+        <property name="username" value="root"/>
+        <property name="password" value="root"/>
+    </bean>
+
+    <!-- creating bean for jdbc template for crud operation-->
+    <bean class="org.springframework.jdbc.core.JdbcTemplate" name="jdbcTemplate">
+        <property name="dataSource" ref="datasource"/>
+    </bean>
+
+    <!-- Bean for BookRestApiService interface by using its SubClass BookRestApiServiceImpl -->
+    <bean class="com.spiderBookStall.RestService.BookRestApiServiceImpl" id="BookRestApiService">
+        <property name="restTemplate" ref="restTemplate"/>
+    </bean>
+    <!--RestTemplate bean -->
+    <bean id="restTemplate" class="org.springframework.web.client.RestTemplate">
+        <property name="messageConverters">
+            <util:list>
+                <bean id="mappingJackson2HttpMessageConverter"
+                      class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"/>
+            </util:list>
+        </property>
+    </bean>
+
+    <!--Bean for customerDao by using its SubClass CustomerDaoImpl-->
+    <bean class="com.spiderBookStall.CustomerDao.CustomerDaoImpl" id="customerDao">
+        <constructor-arg ref="jdbcTemplate"/>
+    </bean>
+    <!--Bean for customerService by using its SubClass CustomerServiceImpl-->
+    <bean class="com.spiderBookStall.CustomerService.CustomerServiceImpl" id="customerService">
+        <property name="customerDao" ref="customerDao"/>
+    </bean>
+    <!--custom validation class bean-->
+    <bean class="com.spiderBookStall.CustomValidator.CustomerRegistrationValidator"
+          id="customerRegistrationValidator" >
+        <property name="customerService" ref="customerService"/>
+    </bean>
+
+
+</beans>
